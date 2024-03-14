@@ -1,0 +1,20 @@
+name: Append data data every hour
+
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 * * * *'
+
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out this repo
+      uses: actions/checkout@v2
+    - name: Append new car traffic data
+      run: |-
+        curl \
+          -H "Authorization: Bearer $TB_ADMIN_TOKEN" \
+          -X POST "https://api.tinybird.co/v0/datasources?mode=append&name=traffic" \
+          -d url='https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets/punts-mesura-trafic-espires-electromagnetiques-puntos-medida-trafico-espiras-ele/exports/csv?lang=en&timezone=UTC&use_labels=false&delimiter=%2C'
