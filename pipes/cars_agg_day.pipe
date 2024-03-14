@@ -1,0 +1,11 @@
+DESCRIPTION >
+    Aggregate cars data by day
+
+NODE cars_by_day
+DESCRIPTION >
+    Average, man and mix values of cars by day
+
+SQL >
+    SELECT day, sensor, avg(ih), min(ih), max(ih) as average
+    FROM cars_clean_mv
+    group by sensor, toDate(datetime) as day

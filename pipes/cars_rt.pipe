@@ -1,0 +1,16 @@
+DESCRIPTION >
+    Last data available for each sensor
+
+NODE cars_now
+DESCRIPTION >
+    The last measurement from each sensor
+
+SQL >
+    SELECT sensor, max(datetime), argMax(ih, datetime) from cars_clean_mv group by sensor
+
+NODE cars_now_count
+DESCRIPTION >
+    Count the number of sensors
+
+SQL >
+    SELECT count() FROM cars_now

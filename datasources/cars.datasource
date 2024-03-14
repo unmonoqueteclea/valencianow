@@ -1,0 +1,16 @@
+DESCRIPTION >
+    Traffic information. For date and ih fields, we are not accepting nulls, so this will generate some ingestion errors
+
+SCHEMA >
+    `_gid` Int64,
+    `angulo` Int32,
+    `fecha_actualizacion` DateTime,
+    `hora_actualizacion` DateTime,
+    `idpm` Int32,
+    `ih` Int32,
+    `geo_shape` String,
+    `geo_point_2d` String
+
+ENGINE MergeTree
+ENGINE_PARTITION_KEY toYear(fecha_actualizacion)
+ENGINE_SORTING_KEY fecha_actualizacion, ih, geo_shape, geo_point_2d
