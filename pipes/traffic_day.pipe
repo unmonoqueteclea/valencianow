@@ -1,6 +1,0 @@
-DESCRIPTION >
-    Traffic sensors data aggregated by day
-
-NODE per_day
-SQL >
-    SELECT day, idpm, avg(ih) as average FROM traffic group by idpm, toDate(datetime) as day
