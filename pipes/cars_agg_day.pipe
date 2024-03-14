@@ -7,5 +7,5 @@ DESCRIPTION >
 
 SQL >
     SELECT day, sensor, avg(ih), min(ih), max(ih), count() as measurements
-    FROM cars_clean_mv
+    FROM cars_mv
     group by sensor, toDate(datetime) as day

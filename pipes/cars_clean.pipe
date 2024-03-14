@@ -30,4 +30,4 @@ SQL >
     SELECT * from unknown where sensor != 217
 
 TYPE MATERIALIZED
-DATASOURCE cars_clean_mv
+DATASOURCE cars_mv
