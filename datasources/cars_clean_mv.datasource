@@ -1,8 +1,7 @@
 DESCRIPTION >
-    Cleaned cars datasource
+    Cleaned and deduplicated cars date
 
 SCHEMA >
-    `id` Int64,
     `angle` Int32,
     `datetime` DateTime,
     `sensor` Int32,

@@ -1,37 +1,33 @@
-NODE cars_select_columns
+NODE deduplicate
 DESCRIPTION >
-    Remove null dates
+    Rename columns and remove duplicates
 
 SQL >
-    SELECT
-        _gid as id,
-        angulo as angle,
-        hora_actualizacion as datetime,
-        idpm as sensor,
-        ih,
-        geo_point_2d as point
-    FROM cars
+    select angulo as angle, hora_actualizacion as datetime, idpm as sensor, ih, geo_point_2d as point
+    from cars
+    order by sensor, datetime
+    limit 1 by sensor, datetime
 
-NODE cars_clean_ih
+NODE unknown
 DESCRIPTION >
     We don't know the meaning of ih=-1, so we will remove those values
 
 SQL >
-    SELECT * FROM cars_select_columns where ih != -1
+    SELECT * FROM deduplicate where ih != -1
 
-NODE cars_check_unexpected_dates
+NODE dates
 DESCRIPTION >
     As you can see, there is an outdated sensor, we will remove it
 
 SQL >
-    SELECT sensor, min(datetime) from cars_clean_ih group by sensor order by min(datetime) LIMIT 3
+    SELECT sensor, min(datetime) from unknown group by sensor order by min(datetime) LIMIT 2
 
-NODE cars_clean_final
+NODE final
 DESCRIPTION >
     The final clean dataset, ready to use
 
 SQL >
-    SELECT * from cars_clean_ih where sensor != 217
+    SELECT * from unknown where sensor != 217
 
 TYPE MATERIALIZED
 DATASOURCE cars_clean_mv
