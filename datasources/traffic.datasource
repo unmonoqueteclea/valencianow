@@ -1,0 +1,16 @@
+DESCRIPTION >
+    Puntos medida trafico espiras electromagneticas
+
+SCHEMA >
+    `_gid` Int64,
+    `angulo` Int32,
+    `date` DateTime,
+    `datetime` DateTime,
+    `idpm` Int32,
+    `ih` Int32,
+    `geo_shape` String,
+    `geo_point_2d` String
+
+ENGINE MergeTree
+ENGINE_PARTITION_KEY toYear(date)
+ENGINE_SORTING_KEY datetime, idpm
