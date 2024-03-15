@@ -2,11 +2,9 @@ import pandas as pd
 import pydeck as pdk
 import streamlit as st
 
-VALENCIA_LAT = 39.46975
-VALENCIA_LON = -0.37739
-
-MAX_IH_BIKE = 1000
-MAX_IH_CAR = 7000
+VALENCIA_LAT, VALENCIA_LON = 39.46975, -0.37739
+MAX_IH_BIKE, MAX_IH_CAR = 1000, 7000
+LABEL_BIKE, LABEL_CAR = "bike", "car"
 
 
 @st.cache_resource
@@ -42,6 +40,7 @@ def traffic_now_heatmap(data: pd.DataFrame, is_bike=False):
 
 def traffic_now_elevation(data: pd.DataFrame, is_bike=False):
     max_ih = MAX_IH_BIKE if is_bike else MAX_IH_CAR
+    label = LABEL_BIKE if is_bike else LABEL_CAR
     scale = 5 if is_bike else 0.5
 
     st.pydeck_chart(
@@ -49,7 +48,7 @@ def traffic_now_elevation(data: pd.DataFrame, is_bike=False):
             # map_style=None,  # type: ignore
             map_style=pdk.map_styles.SATELLITE,
             map_provider="mapbox",
-            tooltip={"text": "vehicles/hour: {ih}"},  # type: ignore
+            tooltip={"text": "🔢 sensor id {sensor} \n ⏱" + label + "s/hour: {ih}"},  # type: ignore
             initial_view_state=pdk.ViewState(
                 latitude=VALENCIA_LAT,
                 longitude=VALENCIA_LON,
