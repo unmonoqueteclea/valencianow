@@ -18,3 +18,9 @@ jobs:
           -H "Authorization: Bearer ${{ secrets.DATASOURCE_TOKEN }}" \
           -X POST "https://api.tinybird.co/v0/datasources?mode=append&name=cars" \
           -d url='https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets/punts-mesura-trafic-espires-electromagnetiques-puntos-medida-trafico-espiras-ele/exports/csv?lang=en&timezone=UTC&use_labels=false&delimiter=%2C'
+    - name: Append new bikes traffic data
+      run: |-
+        curl \
+          -H "Authorization: Bearer ${{ secrets.DATASOURCE_TOKEN }}" \
+          -X POST "https://api.tinybird.co/v0/datasources?mode=append&name=bikes" \
+          -d url='https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets/punts-mesura-bicis-espires-electromagnetiques-puntos-medida-bicis-espiras-electr/exports/csv?lang=es&timezone=UTC&use_labels=false&delimiter=%2C'
