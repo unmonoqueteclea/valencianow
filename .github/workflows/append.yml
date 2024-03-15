@@ -1,10 +1,10 @@
-name: Append data data every hour
+name: Append data data every 30 mins
 
 on:
   push:
   workflow_dispatch:
   schedule:
-    - cron:  '0 * * * *'
+    - cron:  '0,30 * * * *'
 
 jobs:
   scheduled:
