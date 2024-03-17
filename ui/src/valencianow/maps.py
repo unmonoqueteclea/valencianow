@@ -3,7 +3,7 @@ import pydeck as pdk
 import streamlit as st
 
 VALENCIA_LAT, VALENCIA_LON = 39.46975, -0.37739
-MAX_IH_BIKE, MAX_IH_CAR = 1000, 9000
+MAX_IH_BIKE, MAX_IH_CAR = 1000, 8000
 LABEL_BIKE, LABEL_CAR = "bike", "car"
 
 
