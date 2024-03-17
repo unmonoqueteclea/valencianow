@@ -3,7 +3,8 @@ import typing
 import plotly.express as px
 import streamlit as st
 
-from valencianow import config, maps
+import config
+import maps
 
 
 def ui_header():
