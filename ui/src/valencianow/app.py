@@ -76,18 +76,21 @@ def ui_aggregated_sensor_data(data_now, is_bike=False) -> None:
                     data_sensor, x="datetime", y=f"{label}s_per_hour", markers=True
                 )
                 st.plotly_chart(fig, theme="streamlit", use_container_width=True)
-            st.markdown("**📅 data by day**")
-            data_agg_sensor = config.load_data(f"{label}s_per_day", None, sensor)
-            fig = px.bar(data_agg_sensor, x="day", y=f"avg_{label}s_per_hour")
-            st.plotly_chart(fig, theme="streamlit", use_container_width=True)
-            st.markdown("**📅 data by day of week**")
-            data_agg_week_sensor = config.load_data(
-                f"{label}s_per_day_of_week", None, sensor
-            )
-            fig = px.bar(
-                data_agg_week_sensor, x="day_of_week", y=f"avg_{label}s_per_hour"
-            )
-            st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("**📅 data by day**")
+                data_agg_sensor = config.load_data(f"{label}s_per_day", None, sensor)
+                fig = px.bar(data_agg_sensor, x="day", y=f"avg_{label}s_per_hour")
+                st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+            with col2:
+                st.markdown("**📅 data by day of week**")
+                data_agg_week_sensor = config.load_data(
+                    f"{label}s_per_day_of_week", None, sensor
+                )
+                fig = px.bar(
+                    data_agg_week_sensor, x="day_of_week", y=f"avg_{label}s_per_hour"
+                )
+                st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
 
 def ui_tab_car(tab):
