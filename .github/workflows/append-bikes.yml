@@ -1,0 +1,20 @@
+name: append bike traffic data data every 15 mins
+
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron:  '*/15 * * * *'
+
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out this repo
+      uses: actions/checkout@v4
+    - name: append new bike traffic data
+      run: |-
+        curl \
+          -H "Authorization: Bearer ${{ secrets.DATASOURCE_TOKEN }}" \
+          -X POST "https://api.tinybird.co/v0/datasources?mode=append&name=bikes" \
+          -d url='https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets/punts-mesura-bicis-espires-electromagnetiques-puntos-medida-bicis-espiras-electr/exports/csv?lang=es&timezone=UTC&use_labels=false&delimiter=%2C'
