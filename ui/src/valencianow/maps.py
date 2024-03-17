@@ -3,21 +3,21 @@ import pydeck as pdk
 import streamlit as st
 
 VALENCIA_LAT, VALENCIA_LON = 39.46975, -0.37739
-MAX_IH_BIKE, MAX_IH_CAR = 1000, 7000
+MAX_IH_BIKE, MAX_IH_CAR = 1000, 9000
 LABEL_BIKE, LABEL_CAR = "bike", "car"
 
 
 @st.cache_resource
 def traffic_now_heatmap(data: pd.DataFrame, is_bike=False):
     max_ih = MAX_IH_BIKE if is_bike else MAX_IH_CAR
+    radius = 35 if is_bike else 20
+
     st.pydeck_chart(
         pdk.Deck(
             map_style=pdk.map_styles.SATELLITE,
             map_provider="mapbox",
             initial_view_state=pdk.ViewState(
-                latitude=VALENCIA_LAT,
-                longitude=VALENCIA_LON,
-                zoom=12,
+                latitude=VALENCIA_LAT, longitude=VALENCIA_LON, zoom=12
             ),
             layers=[
                 pdk.Layer(
@@ -25,7 +25,7 @@ def traffic_now_heatmap(data: pd.DataFrame, is_bike=False):
                     data=data,
                     color_domain=[50, max_ih / 2],
                     intensity=0.5,
-                    radius_pixels=15,
+                    radius_pixels=radius,
                     get_position="[lon, lat]",
                     aggregation="MEAN",
                     opacity=0.5,
