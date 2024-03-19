@@ -104,7 +104,7 @@ def air_now_scatterplot(data: pd.DataFrame):
             initial_view_state=pdk.ViewState(
                 latitude=VALENCIA_LAT, longitude=VALENCIA_LON, zoom=12
             ),
-            tooltip={"text": "🔢 sensor {sensor} \n 🍃" + "ICA: {ica}"},  # type: ignore
+            tooltip={"text": "🔢 sensor: {sensor} \n 🍃" + "ICA: {ica}"},  # type: ignore
             layers=[
                 pdk.Layer(
                     "ScatterplotLayer",
