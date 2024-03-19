@@ -152,7 +152,7 @@ def ui_tab_car(tab) -> None:
         else:
             max_date = data_now.date.max()
             _date_info_text = f"""💾 Original data from [Valencia Open Data]({config.SOURCE_CARS_NOW}).
-            \n ⌚ **Currently showing data from**: `{max_date}` (**updated every hour**)"""
+            \n 📅 **Currently showing data from**: `{max_date}` (**updated every hour**)"""
             _date_info.markdown(_date_info_text)
             car_maps_col_1, car_maps_col_2 = st.columns(2)
             with car_maps_col_1:
@@ -179,7 +179,7 @@ def ui_tab_bike(tab) -> None:
         else:
             max_date = data_now.date.max()
             _date_info_text = f"""💾 Original data from [Valencia Open Data]({config.SOURCE_BIKES_NOW}).
-            \n ⌚ **Currently showing data from**: `{max_date}` (**updated every 15 min**)"""
+            \n 📅 **Currently showing data from**: `{max_date}` (**updated every 15 min**)"""
             _date_info.markdown(_date_info_text)
             bike_maps_col_1, bikes_maps_col_2 = st.columns(2)
             with bike_maps_col_1:
@@ -209,7 +209,7 @@ def ui_tab_air(tab) -> None:
         else:
             max_date = data_now.date.max()
             _date_info_text = f"""💾 Original data from [Valencia Open Data]({config.SOURCE_BIKES_NOW}).
-            \n ⌚ **Currently showing data from**: `{max_date}` (**updated every hour**)"""
+            \n 📅 **Currently showing data from**: `{max_date}` (**updated every hour**)"""
             _date_info.markdown(_date_info_text)
             maps.air_now_scatterplot(data_now)
         ui_aggregated_sensor_data(data_now, maps.LABEL_AIR)

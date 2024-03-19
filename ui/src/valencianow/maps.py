@@ -48,13 +48,15 @@ def traffic_now_elevation(data: pd.DataFrame, is_bike=False) -> None:
     max_ih = MAX_IH_BIKE if is_bike else MAX_IH_CAR
     label = LABEL_BIKE if is_bike else LABEL_CAR
     scale = 5 if is_bike else 0.5
+    tooltip = "🔢 sensor id: {sensor} \n⏱" + label + "s/hour: {ih}"
+    tooltip += "\n📅 updated: {date}"
 
     st.pydeck_chart(
         pdk.Deck(
             # map_style=None,  # type: ignore
             map_style=pdk.map_styles.SATELLITE,
             map_provider="mapbox",
-            tooltip={"text": "🔢 sensor id: {sensor} \n ⏱" + label + "s/hour: {ih}"},  # type: ignore
+            tooltip={"text": tooltip},  # type: ignore
             initial_view_state=pdk.ViewState(
                 latitude=VALENCIA_LAT, longitude=VALENCIA_LON, zoom=12, pitch=40
             ),
@@ -97,6 +99,7 @@ def air_now_scatterplot(data: pd.DataFrame):
             1: [162, 91, 164],
         }  # type: ignore
     )
+    tooltip = "🔢 sensor: {sensor} \n 🍃 ICA: {ica} \n 📅 updated: {date}"
     st.pydeck_chart(
         pdk.Deck(
             map_style=pdk.map_styles.SATELLITE,
@@ -104,7 +107,7 @@ def air_now_scatterplot(data: pd.DataFrame):
             initial_view_state=pdk.ViewState(
                 latitude=VALENCIA_LAT, longitude=VALENCIA_LON, zoom=12
             ),
-            tooltip={"text": "🔢 sensor: {sensor} \n 🍃" + "ICA: {ica}"},  # type: ignore
+            tooltip={"text": tooltip},  # type: ignore
             layers=[
                 pdk.Layer(
                     "ScatterplotLayer",
