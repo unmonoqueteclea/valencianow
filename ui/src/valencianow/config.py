@@ -6,7 +6,7 @@ from datetime import datetime
 import pandas as pd
 import streamlit as st
 
-APP_NAME = "valencia now"
+APP_NAME = "valencia-now"
 
 TINYBIRD_API = "https://api.tinybird.co/v0/pipes/"
 TINYBIRD_TOKEN = os.environ["TINYBIRD_TOKEN_VLC"]
