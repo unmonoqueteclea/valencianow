@@ -8,7 +8,7 @@ import streamlit as st
 VALENCIA_LAT, VALENCIA_LON = 39.46975, -0.37739
 # approximated expected maximum values, to generate correct ranges
 MAX_IH_BIKE, MAX_IH_CAR = 1000, 8000
-LABEL_BIKE, LABEL_CAR = "bike", "car"
+LABEL_BIKE, LABEL_CAR, LABEL_AIR = "bike", "car", "air"
 
 
 @st.cache_data

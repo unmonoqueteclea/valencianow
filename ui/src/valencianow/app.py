@@ -69,8 +69,37 @@ def ui_reset_date_filter(date, reset) -> typing.Optional[str]:
     return date
 
 
-def ui_aggregated_sensor_data(data_now: pd.DataFrame, is_bike=False) -> None:
-    label = maps.LABEL_BIKE if is_bike else maps.LABEL_CAR
+def ui_aggregated_sensor_data(data_now: pd.DataFrame, label: str) -> None:
+    _info = {
+        maps.LABEL_AIR: {
+            "history_pipe": "air_history",
+            "history_measurement": "air quality",
+            "history_y": "ica",
+            "per_day_pipe": "air_per_day",
+            "per_day_y": "avg_ica",
+            "per_dow_pipe": "air_per_day_of_week",
+            "per_dow_y": "avg_ica",
+        },
+        maps.LABEL_CAR: {
+            "history_pipe": "cars_history",
+            "history_measurement": "cars per hour",
+            "history_y": "cars_per_hour",
+            "per_day_pipe": "cars_per_day",
+            "per_day_y": "avg_cars_per_hour",
+            "per_dow_pipe": "cars_per_day_of_week",
+            "per_dow_y": "avg_cars_per_hour",
+        },
+        maps.LABEL_BIKE: {
+            "history_pipe": "bikes_history",
+            "history_measurement": "bikes per hour",
+            "history_y": "bikes_per_hour",
+            "per_day_pipe": "bikes_per_day",
+            "per_day_y": "avg_bikes_per_hour",
+            "per_dow_pipe": "bikes_per_day_of_week",
+            "per_dow_y": "avg_bikes_per_hour",
+        },
+    }
+    info = _info[label]
     st.markdown("## ➕ individual sensor data")
     with st.form(f"aggregated-sensor-{label}"):
         sensor = st.selectbox(
@@ -78,31 +107,31 @@ def ui_aggregated_sensor_data(data_now: pd.DataFrame, is_bike=False) -> None:
             sorted(data_now.sensor.values),
         )
         if st.form_submit_button("🔎 Find sensor data", use_container_width=True):
-            data_sensor = config.load_data(f"{label}s_history", None, sensor)
+
+            # historical sensor data
+            data_sensor = config.load_data(info["history_pipe"], None, sensor)
             if data_sensor is not None:
-                # historical sensor data
-                st.markdown("#### historical data: traffic per hour")
+                st.markdown(f"#### historical data: {info['history_measurement']}")
                 data_sensor = data_sensor.sort_values(by="datetime")
                 fig = px.line(
-                    data_sensor, x="datetime", y=f"{label}s_per_hour", markers=True
+                    data_sensor, x="datetime", y=info["history_y"], markers=True
                 )
                 st.plotly_chart(fig, theme="streamlit", use_container_width=True)
+
             # aggregated data
-            st.markdown("#### aggregated traffic")
+            st.markdown("#### aggregated data")
             sensor_col_1, sensor_col_2 = st.columns(2)
             with sensor_col_1:
                 st.markdown("**📅 data by day**")
-                data_agg_sensor = config.load_data(f"{label}s_per_day", None, sensor)
-                fig = px.bar(data_agg_sensor, x="day", y=f"avg_{label}s_per_hour")
+                data_agg_sensor = config.load_data(info["per_day_pipe"], None, sensor)
+                fig = px.bar(data_agg_sensor, x="day", y=info["per_day_y"])
                 st.plotly_chart(fig, theme="streamlit", use_container_width=True)
             with sensor_col_2:
                 st.markdown("**📅 data by day of week (1 is Monday)**")
                 data_agg_week_sensor = config.load_data(
-                    f"{label}s_per_day_of_week", None, sensor
+                    info["per_dow_pipe"], None, sensor
                 )
-                fig = px.bar(
-                    data_agg_week_sensor, x="day_of_week", y=f"avg_{label}s_per_hour"
-                )
+                fig = px.bar(data_agg_week_sensor, x="day_of_week", y=info["per_dow_y"])
                 st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
 
@@ -130,7 +159,7 @@ def ui_tab_car(tab) -> None:
                 maps.traffic_now_heatmap(data_now)
             with car_maps_col_2:
                 maps.traffic_now_elevation(data_now)
-            ui_aggregated_sensor_data(data_now)
+            ui_aggregated_sensor_data(data_now, maps.LABEL_CAR)
 
 
 def ui_tab_bike(tab) -> None:
@@ -157,7 +186,7 @@ def ui_tab_bike(tab) -> None:
                 maps.traffic_now_heatmap(data_now, is_bike=True)
             with bikes_maps_col_2:
                 maps.traffic_now_elevation(data_now, is_bike=True)
-            ui_aggregated_sensor_data(data_now, is_bike=True)
+            ui_aggregated_sensor_data(data_now, maps.LABEL_BIKE)
 
 
 def ui_tab_air(tab) -> None:
@@ -183,6 +212,7 @@ def ui_tab_air(tab) -> None:
             \n ⌚ **Currently showing data from**: `{max_date}` (**updated every hour**)"""
             _date_info.markdown(_date_info_text)
             maps.air_now_scatterplot(data_now)
+        ui_aggregated_sensor_data(data_now, maps.LABEL_AIR)
 
 
 def main() -> None:
