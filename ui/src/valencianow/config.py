@@ -1,17 +1,12 @@
 import os
-import pathlib
 import typing
 import urllib.parse
+from datetime import datetime
 
 import pandas as pd
+import streamlit as st
 
 APP_NAME = "valencia now"
-
-# if true, the application will try to use cached data instead of
-# hitting the API (for development purposes)
-USE_CACHED_DATA = False
-# the pipes that shoueld be cached
-CACHE_PIPES = set(["cars_now", "bikes_now"])
 
 TINYBIRD_API = "https://api.tinybird.co/v0/pipes/"
 TINYBIRD_TOKEN = os.environ["TINYBIRD_TOKEN_VLC"]
@@ -41,11 +36,12 @@ def _preprocess(df: pd.DataFrame) -> typing.Optional[pd.DataFrame]:
     return None
 
 
+# caching data for 20 minutes to reduce the number of Tinybird API hits
+@st.cache_data(ttl=1200)
 def load_data(
     pipe_name: str,
     filter_max_datetime: typing.Optional[str],
     filter_sensor: typing.Optional[int] = None,
-    use_cached_data: bool = USE_CACHED_DATA,
 ) -> typing.Optional[pd.DataFrame]:
     """Load data from the given Tinybird pipe name.
 
@@ -53,17 +49,12 @@ def load_data(
     (ignore if filter by a max datetime or sensor).
 
     """
-    cached = pathlib.Path(f"{pipe_name}.csv")
-    if not filter_max_datetime and use_cached_data and cached.exists():
-        return pd.read_csv(cached)
-    params: dict = {"token": TINYBIRD_TOKEN}
+    params: dict = {}
     if filter_max_datetime:
         params["date"] = filter_max_datetime
     if filter_sensor:
         params["sensor"] = filter_sensor
+    print(f"{datetime.now()}: retrieving {pipe_name} data from Tinybird: {params}")
+    params["token"] = TINYBIRD_TOKEN
     url = f"{TINYBIRD_API}{pipe_name}.csv?{urllib.parse.urlencode(params)}"
-    print(f"retrieving {pipe_name} data from Tinybird: {url}")
-    df = _preprocess(pd.read_csv(url))
-    if pipe_name in CACHE_PIPES and df is not None and not filter_max_datetime:
-        df.to_csv(cached)  # cache the data
-    return df
+    return _preprocess(pd.read_csv(url))
