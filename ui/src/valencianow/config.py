@@ -17,6 +17,7 @@ STREAMLIT_LOGO = "https://github.com/unmonoqueteclea/valencianow/blob/main/ui/re
 # data sources
 SOURCE_CARS_NOW = "https://valencia.opendatasoft.com/explore/dataset/punts-mesura-trafic-espires-electromagnetiques-puntos-medida-trafico-espiras-ele/"
 SOURCE_BIKES_NOW = "https://valencia.opendatasoft.com/explore/dataset/punts-mesura-bicis-espires-electromagnetiques-puntos-medida-bicis-espiras-electr/"
+SOURCE_AIR_NOW = "https://valencia.opendatasoft.com/explore/dataset/estacions-contaminacio-atmosferiques-estaciones-contaminacion-atmosfericas/"
 
 
 def _preprocess(df: pd.DataFrame) -> typing.Optional[pd.DataFrame]:

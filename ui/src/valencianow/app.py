@@ -207,7 +207,7 @@ def ui_tab_air(tab) -> None:
             st.error("No data found for selected date and time")
         else:
             max_date = data_now.date.max()
-            _date_info_text = f"""💾 Original data from [Valencia Open Data]({config.SOURCE_BIKES_NOW}).
+            _date_info_text = f"""💾 Original data from [Valencia Open Data]({config.SOURCE_AIR_NOW}).
             \n 📅 **Currently showing data from**: `{max_date}` (**updated every hour**)"""
             _date_info.markdown(_date_info_text)
             maps.air_now_scatterplot(data_now)
