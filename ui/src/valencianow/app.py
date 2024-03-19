@@ -138,10 +138,9 @@ def ui_aggregated_sensor_data(data_now: pd.DataFrame, label: str) -> None:
 def ui_tab_car(tab) -> None:
     with tab:
         st.markdown(
-            """ℹ️ Electromagnetic coils in different parts of the city
-            that are able to measure the number of **cars** passing
-            through them. Both maps represent **number of cars per
-            hour**"""
+            """ℹ️ Induction loops in different parts of the city that
+            are able to measure the number of **cars** passing through
+            them. Both maps represent **number of cars per hour**"""
         )
         _date_info, _reset = st.empty(), st.empty()
         _date = ui_date_selector(1)
@@ -165,8 +164,8 @@ def ui_tab_car(tab) -> None:
 def ui_tab_bike(tab) -> None:
     with tab:
         st.markdown(
-            """ℹ️ Electromagnetic coils in different parts of the city
-            that are able to measure the number of **bikes** passing
+            """ℹ️ Induction loops in different parts of the city that
+            are able to measure the number of **bikes** passing
             through them. Both maps represent **number of bikes per
             hour**"""
         )
