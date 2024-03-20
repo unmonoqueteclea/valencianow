@@ -1,4 +1,4 @@
-"""functions to build the maps shown in the application
+"""functions to build all the maps shown in the application
 
 """
 import pandas as pd
@@ -11,38 +11,36 @@ MAX_IH_BIKE, MAX_IH_CAR = 1000, 8000
 LABEL_BIKE, LABEL_CAR, LABEL_AIR = "bike", "car", "air"
 
 
-@st.cache_data
-def traffic_now_heatmap(data: pd.DataFrame, is_bike=False) -> None:
+@st.cache_resource(max_entries=6, experimental_allow_widgets=True)
+def traffic_now_heatmap(data: pd.DataFrame, is_bike=False):
     """Heatmap with current traffic values"""
     max_ih = MAX_IH_BIKE if is_bike else MAX_IH_CAR
     radius = 35 if is_bike else 20
-    st.pydeck_chart(
-        pdk.Deck(
-            map_style=pdk.map_styles.SATELLITE,
-            map_provider="mapbox",
-            initial_view_state=pdk.ViewState(
-                latitude=VALENCIA_LAT, longitude=VALENCIA_LON, zoom=12
-            ),
-            layers=[
-                pdk.Layer(
-                    "HeatmapLayer",
-                    data=data,
-                    color_domain=[50, max_ih / 2],
-                    intensity=0.5,
-                    radius_pixels=radius,
-                    get_position="[lon, lat]",
-                    aggregation="MEAN",
-                    opacity=0.5,
-                    get_weight="ih",
-                    pickable=True,
-                    extruded=True,
-                )
-            ],
-        )
+    return pdk.Deck(
+        map_style=pdk.map_styles.SATELLITE,
+        map_provider="mapbox",
+        initial_view_state=pdk.ViewState(
+            latitude=VALENCIA_LAT, longitude=VALENCIA_LON, zoom=12
+        ),
+        layers=[
+            pdk.Layer(
+                "HeatmapLayer",
+                data=data,
+                color_domain=[50, max_ih / 2],
+                intensity=0.5,
+                radius_pixels=radius,
+                get_position="[lon, lat]",
+                aggregation="MEAN",
+                opacity=0.5,
+                get_weight="ih",
+                pickable=True,
+                extruded=True,
+            )
+        ],
     )
 
 
-@st.cache_data
+@st.cache_resource(max_entries=6, experimental_allow_widgets=True)
 def traffic_now_elevation(data: pd.DataFrame, is_bike=False) -> None:
     """Map with columns representing traffic values"""
     max_ih = MAX_IH_BIKE if is_bike else MAX_IH_CAR
@@ -50,42 +48,39 @@ def traffic_now_elevation(data: pd.DataFrame, is_bike=False) -> None:
     scale = 5 if is_bike else 0.5
     tooltip = "🔢 sensor id: {sensor} \n⏱" + label + "s/hour: {ih}"
     tooltip += "\n📅 updated: {date}"
-
-    st.pydeck_chart(
-        pdk.Deck(
-            # map_style=None,  # type: ignore
-            map_style=pdk.map_styles.SATELLITE,
-            map_provider="mapbox",
-            tooltip={"text": tooltip},  # type: ignore
-            initial_view_state=pdk.ViewState(
-                latitude=VALENCIA_LAT, longitude=VALENCIA_LON, zoom=12, pitch=40
-            ),
-            layers=[
-                pdk.Layer(
-                    "ColumnLayer",
-                    data,
-                    get_elevation="ih",
-                    get_fill_color=[
-                        # gradient from yellow to red
-                        f"255*(1-ih/{max_ih})+150*ih/{max_ih}",
-                        f"255*(1-ih/{max_ih})",
-                        f"150*(1-ih/{max_ih})",
-                        "160",
-                    ],
-                    get_position=["lon", "lat"],
-                    elevation_aggregation="MEAN",
-                    auto_highlight=True,
-                    elevation_scale=scale,
-                    radius=40,
-                    pickable=True,
-                    coverage=1,
-                )
-            ],
-        )
+    return pdk.Deck(
+        # map_style=None,  # type: ignore
+        map_style=pdk.map_styles.SATELLITE,
+        map_provider="mapbox",
+        tooltip={"text": tooltip},  # type: ignore
+        initial_view_state=pdk.ViewState(
+            latitude=VALENCIA_LAT, longitude=VALENCIA_LON, zoom=12, pitch=40
+        ),
+        layers=[
+            pdk.Layer(
+                "ColumnLayer",
+                data,
+                get_elevation="ih",
+                get_fill_color=[
+                    # gradient from yellow to red
+                    f"255*(1-ih/{max_ih})+150*ih/{max_ih}",
+                    f"255*(1-ih/{max_ih})",
+                    f"150*(1-ih/{max_ih})",
+                    "160",
+                ],
+                get_position=["lon", "lat"],
+                elevation_aggregation="MEAN",
+                auto_highlight=True,
+                elevation_scale=scale,
+                radius=40,
+                pickable=True,
+                coverage=1,
+            )
+        ],
     )
 
 
-@st.cache_data
+@st.cache_resource(max_entries=6, experimental_allow_widgets=True)
 def air_now_scatterplot(data: pd.DataFrame):
     # color recommendations taken from
     # https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/atmosfera-y-calidad-del-aire/calidad-del-aire/ica.html
@@ -100,26 +95,24 @@ def air_now_scatterplot(data: pd.DataFrame):
         }  # type: ignore
     )
     tooltip = "🔢 sensor: {sensor} \n 🍃 ICA: {ica} \n 📅 updated: {date}"
-    st.pydeck_chart(
-        pdk.Deck(
-            map_style=pdk.map_styles.SATELLITE,
-            map_provider="mapbox",
-            initial_view_state=pdk.ViewState(
-                latitude=VALENCIA_LAT, longitude=VALENCIA_LON, zoom=12
-            ),
-            tooltip={"text": tooltip},  # type: ignore
-            layers=[
-                pdk.Layer(
-                    "ScatterplotLayer",
-                    data=data,
-                    pickable=True,
-                    opacity=0.5,
-                    stroked=True,
-                    filled=True,
-                    get_position="[lon, lat]",
-                    get_radius=400,
-                    get_fill_color="color",
-                )
-            ],
-        )
+    return pdk.Deck(
+        map_style=pdk.map_styles.SATELLITE,
+        map_provider="mapbox",
+        initial_view_state=pdk.ViewState(
+            latitude=VALENCIA_LAT, longitude=VALENCIA_LON, zoom=12
+        ),
+        tooltip={"text": tooltip},  # type: ignore
+        layers=[
+            pdk.Layer(
+                "ScatterplotLayer",
+                data=data,
+                pickable=True,
+                opacity=0.5,
+                stroked=True,
+                filled=True,
+                get_position="[lon, lat]",
+                get_radius=400,
+                get_fill_color="color",
+            )
+        ],
     )

@@ -155,9 +155,9 @@ def ui_tab_car(tab) -> None:
             _date_info.markdown(_date_info_text)
             car_maps_col_1, car_maps_col_2 = st.columns(2)
             with car_maps_col_1:
-                maps.traffic_now_heatmap(data_now)
+                st.pydeck_chart(maps.traffic_now_heatmap(data_now))
             with car_maps_col_2:
-                maps.traffic_now_elevation(data_now)
+                st.pydeck_chart(maps.traffic_now_elevation(data_now))
             ui_aggregated_sensor_data(data_now, maps.LABEL_CAR)
 
 
@@ -182,9 +182,9 @@ def ui_tab_bike(tab) -> None:
             _date_info.markdown(_date_info_text)
             bike_maps_col_1, bikes_maps_col_2 = st.columns(2)
             with bike_maps_col_1:
-                maps.traffic_now_heatmap(data_now, is_bike=True)
+                st.pydeck_chart(maps.traffic_now_heatmap(data_now, is_bike=True))
             with bikes_maps_col_2:
-                maps.traffic_now_elevation(data_now, is_bike=True)
+                st.pydeck_chart(maps.traffic_now_elevation(data_now, is_bike=True))
             ui_aggregated_sensor_data(data_now, maps.LABEL_BIKE)
 
 
@@ -210,7 +210,7 @@ def ui_tab_air(tab) -> None:
             _date_info_text = f"""💾 Original data from [Valencia Open Data]({config.SOURCE_AIR_NOW}).
             \n 📅 **Currently showing data from**: `{max_date}` (**updated every hour**)"""
             _date_info.markdown(_date_info_text)
-            maps.air_now_scatterplot(data_now)
+            st.pydeck_chart(maps.air_now_scatterplot(data_now))
         ui_aggregated_sensor_data(data_now, maps.LABEL_AIR)
 
 
