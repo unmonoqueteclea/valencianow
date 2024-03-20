@@ -196,8 +196,8 @@ def ui_tab_air(tab) -> None:
         in different parts of the city. Possible values are:"""
         )
         st.markdown(
-            """ **1**: `extremely bad`, **2**: `very bad`, **3**: `bad`,
-        **4**: `average`, **5**: `mostly good`,  **6**: `good`."""
+            """ **1**: `hazardous`, **2**: `very unhealthy`, **3**: `unhealthy`,
+        **4**: `moderate`, **5**: `fair`,  **6**: `good`."""
         )
         _date_info, _reset = st.empty(), st.empty()
         _date = ui_date_selector(3)
