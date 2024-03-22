@@ -178,7 +178,7 @@ def ui_tab_bike(tab) -> None:
         else:
             max_date = data_now.date.max()
             _date_info_text = f"""💾 Original data from [Valencia Open Data]({config.SOURCE_BIKES_NOW}).
-            \n 📅 **Currently showing data from**: `{max_date}` (**updated every 15 min**)"""
+            \n 📅 **Currently showing data from**: `{max_date}` (**updated every 30 min**)"""
             _date_info.markdown(_date_info_text)
             bike_maps_col_1, bikes_maps_col_2 = st.columns(2)
             with bike_maps_col_1:
