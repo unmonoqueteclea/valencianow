@@ -81,12 +81,12 @@ def ui_aggregated_sensor_data(data_now: pd.DataFrame, label: str) -> None:
             "per_dow_y": "avg_ica",
         },
         maps.LABEL_CAR: {
-            "history_pipe": "cars_history",
+            "history_pipe": "traffic_cars_history",
             "history_measurement": "cars per hour",
-            "history_y": "cars_per_hour",
-            "per_day_pipe": "cars_per_day",
+            "history_y": "traffic_cars_per_hour",
+            "per_day_pipe": "traffic_cars_per_day",
             "per_day_y": "avg_cars_per_hour",
-            "per_dow_pipe": "cars_per_day_of_week",
+            "per_dow_pipe": "traffic_cars_per_day_of_week",
             "per_dow_y": "avg_cars_per_hour",
         },
         maps.LABEL_BIKE: {
@@ -107,7 +107,6 @@ def ui_aggregated_sensor_data(data_now: pd.DataFrame, label: str) -> None:
             sorted(data_now.sensor.values),
         )
         if st.form_submit_button("🔎 Find sensor data", use_container_width=True):
-
             # historical sensor data
             data_sensor = config.load_data(info["history_pipe"], None, sensor)
             if data_sensor is not None:
@@ -144,7 +143,7 @@ def ui_tab_car(tab) -> None:
         )
         _date_info, _reset = st.empty(), st.empty()
         _date = ui_date_selector(1)
-        data_now = config.load_data("cars_now", _date)
+        data_now = config.load_data("traffic_cars_now", _date)
         _date = ui_reset_date_filter(_date, _reset)
         if data_now is None:
             st.error("No data found for selected date and time")
