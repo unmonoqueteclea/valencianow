@@ -72,30 +72,30 @@ def ui_reset_date_filter(date, reset) -> typing.Optional[str]:
 def ui_aggregated_sensor_data(data_now: pd.DataFrame, label: str) -> None:
     _info = {
         maps.LABEL_AIR: {
-            "history_pipe": "air_history",
+            "history_pipe": "air_quality_history",
             "history_measurement": "air quality",
             "history_y": "ica",
-            "per_day_pipe": "air_per_day",
+            "per_day_pipe": "air_quality_per_day",
             "per_day_y": "avg_ica",
-            "per_dow_pipe": "air_per_day_of_week",
+            "per_dow_pipe": "air_quality_per_day_of_week",
             "per_dow_y": "avg_ica",
         },
         maps.LABEL_CAR: {
             "history_pipe": "traffic_cars_history",
             "history_measurement": "cars per hour",
-            "history_y": "traffic_cars_per_hour",
+            "history_y": "cars_per_hour",
             "per_day_pipe": "traffic_cars_per_day",
             "per_day_y": "avg_cars_per_hour",
             "per_dow_pipe": "traffic_cars_per_day_of_week",
             "per_dow_y": "avg_cars_per_hour",
         },
         maps.LABEL_BIKE: {
-            "history_pipe": "bikes_history",
+            "history_pipe": "traffic_bikes_history",
             "history_measurement": "bikes per hour",
             "history_y": "bikes_per_hour",
-            "per_day_pipe": "bikes_per_day",
+            "per_day_pipe": "traffic_bikes_per_day",
             "per_day_y": "avg_bikes_per_hour",
-            "per_dow_pipe": "bikes_per_day_of_week",
+            "per_dow_pipe": "traffic_bikes_per_day_of_week",
             "per_dow_y": "avg_bikes_per_hour",
         },
     }
@@ -170,7 +170,7 @@ def ui_tab_bike(tab) -> None:
         )
         _date_info, _reset = st.empty(), st.empty()
         _date = ui_date_selector(2)
-        data_now = config.load_data("bikes_now", _date)
+        data_now = config.load_data("traffic_bikes_now", _date)
         _date = ui_reset_date_filter(_date, _reset)
         if data_now is None:
             st.error("No data found for selected date and time")
@@ -200,7 +200,7 @@ def ui_tab_air(tab) -> None:
         )
         _date_info, _reset = st.empty(), st.empty()
         _date = ui_date_selector(3)
-        data_now = config.load_data("air_now", _date)
+        data_now = config.load_data("air_quality_now", _date)
         _date = ui_reset_date_filter(_date, _reset)
         if data_now is None:
             st.error("No data found for selected date and time")

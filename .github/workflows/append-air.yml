@@ -16,5 +16,5 @@ jobs:
       run: |-
         curl \
           -H "Authorization: Bearer ${{ secrets.DATASOURCE_TOKEN }}" \
-          -X POST "https://api.tinybird.co/v0/datasources?mode=append&name=air" \
-          -d url='https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets/estacions-contaminacio-atmosferiques-estaciones-contaminacion-atmosfericas/exports/csv?lang=en&timezone=UTC&use_labels=false&delimiter=%2C'
+          -X POST "https://api.tinybird.co/v0/datasources?mode=append&name=air_quality_csv" \
+          -d url='https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets/estacions-contaminacio-atmosferiques-estaciones-contaminacion-atmosfericas/exports/csv?timezone=UTC&use_labels=false&delimiter=%2C'
