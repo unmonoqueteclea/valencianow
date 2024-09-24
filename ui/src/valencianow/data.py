@@ -1,9 +1,11 @@
 import urllib.parse
+from datetime import datetime
 
 # Streamlit Cloud won't install the package, so we can't do:
 # from valencianow import config
 import config  # type: ignore
 import pandas as pd
+import pytz
 import streamlit as st
 
 logger = config.LOGGER
@@ -57,12 +59,24 @@ def _process(df: pd.DataFrame) -> pd.DataFrame | None:
     return None
 
 
+def _date_to_utc(date: str) -> str:
+    # receive a data with format YYYY-MM-DD HH:MM:SS in timezone
+    # Europe/Madrid and return a date with the same format but in timezone UTC
+    madrid_tz = pytz.timezone("Europe/Madrid")
+    utc_tz = pytz.utc
+    naive_datetime = datetime.strptime(date, "%Y-%m-%d %H:%M:%S")
+    localized_datetime = madrid_tz.localize(naive_datetime)
+    utc_datetime = localized_datetime.astimezone(utc_tz)
+    return utc_datetime.strftime("%Y-%m-%d %H:%M:%S")
+
+
 # caching data for some time to reduce the number of Tinybird API hits
 @st.cache_data(ttl=config.DATA_CACHE_SECONDS)
 def load_data(
     pipe_name: str,  # the name of the Tinybird PIPE
     filter_max_date: str | None,
     filter_sensor: int | None = None,
+    local_time: bool = False,
 ) -> pd.DataFrame | None:
     """Load data from the given Tinybird pipe name.
 
@@ -71,6 +85,8 @@ def load_data(
     """
     params: dict = {}
     if filter_max_date:
+        if not local_time:
+            filter_max_date = _date_to_utc(filter_max_date)
         params["date"] = filter_max_date
     if filter_sensor:
         params["sensor"] = filter_sensor

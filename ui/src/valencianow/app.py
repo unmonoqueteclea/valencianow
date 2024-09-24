@@ -115,7 +115,7 @@ def render_tab_air(tab) -> None:
         )
         air_date_info, air_date_reset = st.empty(), st.empty()
         air_date = components.date_selector(3)
-        air_quality_data = data.load_data("air_quality_now", air_date)
+        air_quality_data = data.load_data("air_quality_now", air_date, local_time=True)
         air_date = components.reset_date_filter(air_date, air_date_reset)
         if air_quality_data is None:
             st.error("No data found for selected date and time")
