@@ -4,12 +4,25 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "valencianow"
-version = "0.0.1"
+version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
     "streamlit>=1.32.2,<2",
     "plotly>=5,<6"
 ]
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+target-version = "py312"
+
+[tool.pyright]
+include = ["src"]
+typeCheckingMode = "standard"
+pythonVersion = "3.12"
+
+[project.optional-dependencies]
+dev = ["ruff"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
