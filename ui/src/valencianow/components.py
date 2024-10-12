@@ -57,24 +57,46 @@ def reset_date_filter(date: str | None, reset) -> str | None:
     return date
 
 
-def historical_graph(pipe: str, sensor: str, measurement: str, y_axis: str) -> None:
-    data_sensor = data.load_data(pipe, None, sensor)
+def historical_graph(
+    pipe: str, timespan: str, sensor: str, measurement: str, y_axis: str
+) -> None:
+    data_sensor = data.load_data(pipe, None, sensor, filter_timespan=timespan)
     if data_sensor is not None:
-        st.markdown(f"#### historical data: {measurement}")
+        st.markdown(f"#### Historical data: {measurement} ({timespan})")
         data_sensor = data_sensor.sort_values(by="datetime")
-        fig = px.line(data_sensor, x="datetime", y=y_axis, markers=True)
+        fig = px.line(
+            data_sensor, x="datetime", y=y_axis, markers=True, line_shape="spline"
+        )
         st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
 
-def per_day_graph(pipe: str, sensor: str, y_axis):
-    st.markdown("**📅 data by day**")
-    data_agg_sensor = data.load_data(pipe, None, sensor)
-    fig = px.bar(data_agg_sensor, x="day", y=y_axis)
+def per_day_graph(pipe: str, sensor: str, timespan: str, y_axis):
+    st.markdown("**📅 Data by day**")
+    data_agg_sensor = data.load_data(pipe, None, sensor, filter_timespan=timespan)
+    fig = px.bar(
+        data_agg_sensor,
+        x="day",
+        y=y_axis,
+        hover_data={"day": "|%A - %B %d, %Y"},
+    )
+    fig.update_xaxes(tickformat="%a - %b %d")
     st.plotly_chart(fig, theme="streamlit", use_container_width=True)
 
 
-def per_day_of_week_graph(pipe: str, sensor: str, y_axis):
-    st.markdown("**📅 data by day of week (1 is Monday)**")
+def per_day_of_week_graph(pipe: str, sensor: str, timespan: str, y_axis):
+    st.markdown("**📅 Data by day of week**")
     data_agg_week_sensor = data.load_data(pipe, None, sensor)
+    day_name_map = {
+        1: "Monday",
+        2: "Tuesday",
+        3: "Wednesday",
+        4: "Thursday",
+        5: "Friday",
+        6: "Saturday",
+        7: "Sunday",
+    }
+    data_agg_week_sensor["day_of_week"] = data_agg_week_sensor["day_of_week"].map(
+        day_name_map
+    )
     fig = px.bar(data_agg_week_sensor, x="day_of_week", y=y_axis)
     st.plotly_chart(fig, theme="streamlit", use_container_width=True)

@@ -18,26 +18,35 @@ import streamlit as st
 
 def aggregated_sensor_data(data_now: pd.DataFrame, label: str) -> None:
     info = data.PIPES[label]
-    st.markdown("## ➕ individual sensor data")
+    st.markdown("## ➕ Individual sensor data")
     with st.form(f"aggregated-sensor-{label}"):
         sensor = st.selectbox(
-            "🔢 Select a sensor to show its data (sensor numbers in map tooltips)",
+            "🔢 Select a sensor to show its data (sensor ids in map tooltips)",
             sorted(data_now.sensor.values),
         )
+        timespan = st.radio(
+            "Select a time span: ",
+            ["Today", "Last Week", "Last Month", "Last Year"],
+            index=2,
+            horizontal=True,
+        )
+
         if st.form_submit_button("🔎 Find sensor data", use_container_width=True):
             components.historical_graph(
-                info["hist_pipe"], sensor, info["hist_meas"], info["hist_y"]
+                info["hist_pipe"], timespan, sensor, info["hist_meas"], info["hist_y"]
             )
-            st.markdown("#### aggregated data")
-            sensor_col_1, sensor_col_2 = st.columns(2)
-            with sensor_col_1:
-                components.per_day_graph(
-                    info["per_day_pipe"], sensor, info["per_day_y"]
-                )
-            with sensor_col_2:
-                components.per_day_of_week_graph(
-                    info["per_dow_pipe"], sensor, info["per_dow_y"]
-                )
+            if timespan != "Today":
+                st.markdown(f"#### Aggregated data ({timespan})")
+                sensor_col_1, sensor_col_2 = st.columns(2)
+                with sensor_col_1:
+                    components.per_day_graph(
+                        info["per_day_pipe"], sensor, timespan, info["per_day_y"]
+                    )
+                if timespan != "Last Week":
+                    with sensor_col_2:
+                        components.per_day_of_week_graph(
+                            info["per_dow_pipe"], sensor, timespan, info["per_dow_y"]
+                        )
 
 
 def render_tab_car(tab) -> None:

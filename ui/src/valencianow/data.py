@@ -1,5 +1,5 @@
 import urllib.parse
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 
 # Streamlit Cloud won't install the package, so we can't do:
 # from valencianow import config
@@ -70,12 +70,26 @@ def _date_to_utc(date: str) -> str:
     return utc_datetime.strftime("%Y-%m-%d %H:%M:%S")
 
 
+def _min_date(current_date: datetime, timespan: str) -> str:
+    output = current_date
+    if timespan == "Today":
+        output -= timedelta(days=1)
+    elif timespan == "Last Week":
+        output -= timedelta(days=7)
+    elif timespan == "Last Month":
+        output -= timedelta(days=31)
+    elif timespan == "Last Year":
+        output -= timedelta(days=365)
+    return output.strftime("%Y-%m-%d %H:%M:%S")
+
+
 # caching data for some time to reduce the number of Tinybird API hits
 @st.cache_data(ttl=config.DATA_CACHE_SECONDS)
 def load_data(
     pipe_name: str,  # the name of the Tinybird PIPE
     filter_max_date: str | None,
     filter_sensor: int | None = None,
+    filter_timespan: str | None = None,
     local_time: bool = False,
 ) -> pd.DataFrame | None:
     """Load data from the given Tinybird pipe name.
@@ -88,6 +102,12 @@ def load_data(
         if not local_time:
             filter_max_date = _date_to_utc(filter_max_date)
         params["date"] = filter_max_date
+    if filter_timespan:
+        if filter_max_date:
+            max_date = datetime.strptime(filter_max_date, "%Y-%m-%d %H:%M:%S")
+        else:
+            max_date = datetime.now(timezone.utc)
+        params["min_date"] = _min_date(max_date, filter_timespan)
     if filter_sensor:
         params["sensor"] = filter_sensor
     logger.info(f"Retrieving {pipe_name} data from Tinybird: {params}")

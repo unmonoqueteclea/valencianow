@@ -1,6 +1,5 @@
-"""functions to build all the maps shown in the application
+"""functions to build all the maps shown in the application"""
 
-"""
 import pandas as pd
 import pydeck as pdk
 import streamlit as st
@@ -46,8 +45,8 @@ def traffic_now_elevation(data: pd.DataFrame, is_bike=False) -> None:
     max_ih = MAX_IH_BIKE if is_bike else MAX_IH_CAR
     label = LABEL_BIKE if is_bike else LABEL_CAR
     scale = 5 if is_bike else 0.5
-    tooltip = "🔢 sensor id: {sensor} \n⏱" + label + "s/hour: {ih}"
-    tooltip += "\n📅 updated: {date}"
+    tooltip = "🔢 Sensor id: {sensor} \n⏱ " + label.capitalize() + "s/hour: {ih}"
+    tooltip += "\n📅 Updated: {date}"
     return pdk.Deck(
         # map_style=None,  # type: ignore
         map_style=pdk.map_styles.SATELLITE,
@@ -94,7 +93,7 @@ def air_now_scatterplot(data: pd.DataFrame):
             1: [162, 91, 164],
         }  # type: ignore
     )
-    tooltip = "🔢 sensor: {sensor} \n 🍃 ICA: {ica} \n 📅 updated: {date}"
+    tooltip = "🔢 Sensor: {sensor} \n 🍃 ICA: {ica} \n 📅 Updated: {date}"
     return pdk.Deck(
         map_style=pdk.map_styles.SATELLITE,
         map_provider="mapbox",

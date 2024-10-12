@@ -9,7 +9,7 @@ logger_handler.setFormatter(formatter)
 LOGGER.addHandler(logger_handler)
 
 
-APP_NAME = "valencia-now"
+APP_NAME = "Valencia-Now"
 
 TINYBIRD_API = "https://api.tinybird.co/v0/pipes/"
 TINYBIRD_TOKEN = os.environ["TINYBIRD_TOKEN_VLC"]
