@@ -1,0 +1,29 @@
+DESCRIPTION >
+    Returns the latest air quality reading (ICA) for each station
+
+NODE air_now_node
+SQL >
+    %
+    SELECT
+        _objectid,
+        geo_point_2d,
+        fecha_carga,
+        multiIf(
+            calidad_ambiental = 'Buena', 6,
+            calidad_ambiental = 'Razonablemente Buena', 5,
+            calidad_ambiental = 'Moderada', 4,
+            calidad_ambiental = 'Desfavorable', 3,
+            calidad_ambiental = 'Muy desfavorable', 2,
+            calidad_ambiental = 'Peligrosa', 1,
+            0
+        ) as ica
+    FROM air
+    WHERE fecha_carga = (
+        SELECT max(fecha_carga)
+        FROM air
+        {% if defined(max_date) %}
+        WHERE fecha_carga <= {{DateTime(max_date)}}
+        {% end %}
+    )
+
+TYPE endpoint

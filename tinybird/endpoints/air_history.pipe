@@ -1,0 +1,33 @@
+DESCRIPTION >
+    Returns historical air quality data (ICA) for a specific station
+
+NODE air_history_node
+SQL >
+    %
+    SELECT
+        _objectid,
+        geo_point_2d,
+        fecha_carga,
+        multiIf(
+            calidad_ambiental = 'Buena', 6,
+            calidad_ambiental = 'Razonablemente Buena', 5,
+            calidad_ambiental = 'Moderada', 4,
+            calidad_ambiental = 'Desfavorable', 3,
+            calidad_ambiental = 'Muy desfavorable', 2,
+            calidad_ambiental = 'Peligrosa', 1,
+            0
+        ) as ica
+    FROM air
+    WHERE 1=1
+    {% if defined(_objectid) %}
+    AND _objectid = {{Int16(_objectid, 0)}}
+    {% end %}
+    {% if defined(min_date) %}
+    AND fecha_carga >= {{DateTime(min_date)}}
+    {% end %}
+    {% if defined(max_date) %}
+    AND fecha_carga <= {{DateTime(max_date)}}
+    {% end %}
+    ORDER BY fecha_carga ASC
+
+TYPE endpoint

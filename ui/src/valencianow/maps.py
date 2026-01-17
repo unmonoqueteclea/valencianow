@@ -2,34 +2,38 @@
 
 import pandas as pd
 import pydeck as pdk
-import streamlit as st
 
-VALENCIA_LAT, VALENCIA_LON = 39.46975, -0.37739
+from valencianow import config, data
+
+LABEL_BIKE, LABEL_CAR, LABEL_AIR = "bike", "car", "air"
 # approximated expected maximum values, to generate correct ranges
 MAX_IH_BIKE, MAX_IH_CAR = 1000, 8000
-LABEL_BIKE, LABEL_CAR, LABEL_AIR = "bike", "car", "air"
+RADIUS_BIKE, RADIUS_CAR = 35, 15
+SCALE_BIKE, SCALE_CAR = 5, 0.5
+AGGREGATION = "MEAN"
 
 
-@st.cache_resource(max_entries=6, experimental_allow_widgets=True)
-def traffic_now_heatmap(data: pd.DataFrame, is_bike=False):
+def traffic_now_heatmap(rows: pd.DataFrame, is_bike=False):
     """Heatmap with current traffic values"""
+
     max_ih = MAX_IH_BIKE if is_bike else MAX_IH_CAR
-    radius = 35 if is_bike else 20
+    radius = RADIUS_BIKE if is_bike else RADIUS_CAR
+
     return pdk.Deck(
-        map_style=pdk.map_styles.SATELLITE,
-        map_provider="mapbox",
+        map_style="dark",
+        map_provider="carto",
         initial_view_state=pdk.ViewState(
-            latitude=VALENCIA_LAT, longitude=VALENCIA_LON, zoom=12
+            latitude=config.VALENCIA_LAT, longitude=config.VALENCIA_LON, zoom=12
         ),
         layers=[
             pdk.Layer(
                 "HeatmapLayer",
-                data=data,
-                color_domain=[50, max_ih / 2],
-                intensity=0.5,
+                data=rows,
+                color_domain=[100, max_ih],
+                intensity=1,
                 radius_pixels=radius,
-                get_position="[lon, lat]",
-                aggregation="MEAN",
+                get_position=f"[{data.COL_LON}, {data.COL_LAT}]",
+                aggregation=AGGREGATION,
                 opacity=0.5,
                 get_weight="ih",
                 pickable=True,
@@ -39,26 +43,33 @@ def traffic_now_heatmap(data: pd.DataFrame, is_bike=False):
     )
 
 
-@st.cache_resource(max_entries=6, experimental_allow_widgets=True)
-def traffic_now_elevation(data: pd.DataFrame, is_bike=False) -> None:
+def traffic_now_elevation(rows: pd.DataFrame, is_bike=False) -> pdk.Deck:
     """Map with columns representing traffic values"""
+
     max_ih = MAX_IH_BIKE if is_bike else MAX_IH_CAR
     label = LABEL_BIKE if is_bike else LABEL_CAR
-    scale = 5 if is_bike else 0.5
-    tooltip = "🔢 Sensor id: {sensor} \n⏱ " + label.capitalize() + "s/hour: {ih}"
-    tooltip += "\n📅 Updated: {date}"
+    scale = SCALE_BIKE if is_bike else SCALE_CAR
+    radius = RADIUS_BIKE if is_bike else RADIUS_CAR
+
+    tooltip = (
+        f"🔢 Sensor id: {{{data.COL_SENSOR}}} \n"
+        f"⏱️ {label.capitalize()}s/hour: {{ih}} \n"
+        f"📅 Updated: {{{data.COL_DATE}}}"
+    )
     return pdk.Deck(
-        # map_style=None,  # type: ignore
-        map_style=pdk.map_styles.SATELLITE,
-        map_provider="mapbox",
+        map_style="dark",
+        map_provider="carto",
         tooltip={"text": tooltip},  # type: ignore
         initial_view_state=pdk.ViewState(
-            latitude=VALENCIA_LAT, longitude=VALENCIA_LON, zoom=12, pitch=40
+            latitude=config.VALENCIA_LAT,
+            longitude=config.VALENCIA_LON,
+            zoom=12,
+            pitch=40,
         ),
         layers=[
             pdk.Layer(
                 "ColumnLayer",
-                data,
+                rows,
                 get_elevation="ih",
                 get_fill_color=[
                     # gradient from yellow to red
@@ -67,11 +78,11 @@ def traffic_now_elevation(data: pd.DataFrame, is_bike=False) -> None:
                     f"150*(1-ih/{max_ih})",
                     "160",
                 ],
-                get_position=["lon", "lat"],
-                elevation_aggregation="MEAN",
+                get_position=[data.COL_LON, data.COL_LAT],
+                elevation_aggregation=AGGREGATION,
                 auto_highlight=True,
                 elevation_scale=scale,
-                radius=40,
+                radius=radius,
                 pickable=True,
                 coverage=1,
             )
@@ -79,11 +90,10 @@ def traffic_now_elevation(data: pd.DataFrame, is_bike=False) -> None:
     )
 
 
-@st.cache_resource(max_entries=6, experimental_allow_widgets=True)
-def air_now_scatterplot(data: pd.DataFrame):
+def air_now_scatterplot(rows: pd.DataFrame):
     # color recommendations taken from
     # https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/atmosfera-y-calidad-del-aire/calidad-del-aire/ica.html
-    data["color"] = data["ica"].map(
+    rows["color"] = rows["ica"].map(
         {
             6: [56, 162, 206],
             5: [50, 161, 94],
@@ -93,24 +103,24 @@ def air_now_scatterplot(data: pd.DataFrame):
             1: [162, 91, 164],
         }  # type: ignore
     )
-    tooltip = "🔢 Sensor: {sensor} \n 🍃 ICA: {ica} \n 📅 Updated: {date}"
+    tooltip = f"🔢 Sensor: {{{data.COL_SENSOR}}} \n 🍃 ICA: {{ica}} \n 📅 Updated: {{{data.COL_DATE}}}"
     return pdk.Deck(
-        map_style=pdk.map_styles.SATELLITE,
-        map_provider="mapbox",
+        map_style="dark",
+        map_provider="carto",
         initial_view_state=pdk.ViewState(
-            latitude=VALENCIA_LAT, longitude=VALENCIA_LON, zoom=12
+            latitude=config.VALENCIA_LAT, longitude=config.VALENCIA_LON, zoom=12
         ),
         tooltip={"text": tooltip},  # type: ignore
         layers=[
             pdk.Layer(
                 "ScatterplotLayer",
-                data=data,
+                data=rows,
                 pickable=True,
                 opacity=0.5,
                 stroked=True,
                 filled=True,
-                get_position="[lon, lat]",
-                get_radius=400,
+                get_position=f"[{data.COL_LON}, {data.COL_LAT}]",
+                get_radius=440,
                 get_fill_color="color",
             )
         ],

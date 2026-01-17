@@ -1,18 +1,13 @@
 import logging
 import os
 
-LOGGER = logging.getLogger("valencia-now")
-LOGGER.setLevel(logging.DEBUG)
-logger_handler = logging.StreamHandler()
-formatter = logging.Formatter("%(asctime)s %(levelname)-8s [%(module)s] %(message)s")
-logger_handler.setFormatter(formatter)
-LOGGER.addHandler(logger_handler)
-
-
 APP_NAME = "Valencia-Now"
+TAB_CAR, TAB_BIKE, TAB_AIR = "car", "bike", "air"
 
-TINYBIRD_API = "https://api.tinybird.co/v0/pipes/"
-TINYBIRD_TOKEN = os.environ["TINYBIRD_TOKEN_VLC"]
+VALENCIA_LAT, VALENCIA_LON = 39.46975, -0.37739
+
+TINYBIRD_API = os.environ["TINYBIRD_HOST"]
+TINYBIRD_TOKEN = os.environ["TINYBIRD_TOKEN"]
 
 # urls of the original data sources
 OPENDATA_VAL = "https://valencia.opendatasoft.com/explore/dataset"
@@ -20,9 +15,9 @@ CARS_DATA_URL = f"{OPENDATA_VAL}/punts-mesura-trafic-espires-electromagnetiques-
 BIKES_DATA_URL = f"{OPENDATA_VAL}/punts-mesura-bicis-espires-electromagnetiques-puntos-medida-bicis-espiras-electr/"
 AIR_DATA_URL = f"{OPENDATA_VAL}/estacions-contaminacio-atmosferiques-estaciones-contaminacion-atmosfericas/"
 
-DATA_CACHE_SECONDS = 600  # 10 minutes
-
-# you are not expected to change any of the followng, they are just constants
-TAB_CAR = "car"
-TAB_BIKE = "bike"
-TAB_AIR = "air"
+logger = logging.getLogger("valencianow")
+logger.setLevel(logging.DEBUG)
+logger_handler = logging.StreamHandler()
+formatter = logging.Formatter("%(asctime)s %(levelname)-8s [%(module)s] %(message)s")
+logger_handler.setFormatter(formatter)
+logger.addHandler(logger_handler)

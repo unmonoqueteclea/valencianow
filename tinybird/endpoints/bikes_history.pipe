@@ -1,0 +1,25 @@
+DESCRIPTION >
+    Returns historical bike traffic data for a specific sensor
+
+NODE bikes_history_node
+SQL >
+    %
+    SELECT
+        idpm,
+        geo_point_2d,
+        last_edited_date,
+        ih
+    FROM bikes
+    WHERE 1=1
+    {% if defined(idpm) %}
+    AND idpm = {{Int32(idpm, 0)}}
+    {% end %}
+    {% if defined(min_date) %}
+    AND last_edited_date >= {{DateTime(min_date)}}
+    {% end %}
+    {% if defined(max_date) %}
+    AND last_edited_date <= {{DateTime(max_date)}}
+    {% end %}
+    ORDER BY last_edited_date ASC
+
+TYPE endpoint

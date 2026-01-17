@@ -1,0 +1,24 @@
+DESCRIPTION >
+    Returns average car traffic per day of week for a specific sensor
+
+NODE cars_per_day_of_week_node
+SQL >
+    %
+    SELECT
+        toDayOfWeek(last_edited_date) as day_of_week,
+        avg(ih) as avg_ih
+    FROM cars
+    WHERE 1=1
+    {% if defined(idpm) %}
+    AND idpm = {{Int32(idpm, 0)}}
+    {% end %}
+    {% if defined(min_date) %}
+    AND last_edited_date >= {{DateTime(min_date)}}
+    {% end %}
+    {% if defined(max_date) %}
+    AND last_edited_date <= {{DateTime(max_date)}}
+    {% end %}
+    GROUP BY day_of_week
+    ORDER BY day_of_week ASC
+
+TYPE endpoint

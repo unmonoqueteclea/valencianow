@@ -1,0 +1,21 @@
+DESCRIPTION >
+    Returns the latest car traffic reading for each sensor
+
+NODE cars_now_node
+SQL >
+    %
+    SELECT
+        idpm,
+        geo_point_2d,
+        last_edited_date,
+        ih
+    FROM cars
+    WHERE last_edited_date = (
+        SELECT max(last_edited_date)
+        FROM cars
+        {% if defined(max_date) %}
+        WHERE last_edited_date <= {{DateTime(max_date)}}
+        {% end %}
+    )
+
+TYPE endpoint

@@ -1,0 +1,34 @@
+DESCRIPTION >
+    Returns average air quality (ICA) per day for a specific station
+
+NODE air_per_day_node
+SQL >
+    %
+    SELECT
+        toDate(fecha_carga) as day,
+        avg(
+            multiIf(
+                calidad_ambiental = 'Buena', 6,
+                calidad_ambiental = 'Razonablemente Buena', 5,
+                calidad_ambiental = 'Moderada', 4,
+                calidad_ambiental = 'Desfavorable', 3,
+                calidad_ambiental = 'Muy desfavorable', 2,
+                calidad_ambiental = 'Peligrosa', 1,
+                0
+            )
+        ) as avg_ica
+    FROM air
+    WHERE 1=1
+    {% if defined(_objectid) %}
+    AND _objectid = {{Int16(_objectid, 0)}}
+    {% end %}
+    {% if defined(min_date) %}
+    AND fecha_carga >= {{DateTime(min_date)}}
+    {% end %}
+    {% if defined(max_date) %}
+    AND fecha_carga <= {{DateTime(max_date)}}
+    {% end %}
+    GROUP BY day
+    ORDER BY day ASC
+
+TYPE endpoint

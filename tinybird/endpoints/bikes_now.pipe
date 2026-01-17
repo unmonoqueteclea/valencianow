@@ -1,0 +1,21 @@
+DESCRIPTION >
+    Returns the latest bike traffic reading for each sensor
+
+NODE bikes_now_node
+SQL >
+    %
+    SELECT
+        idpm,
+        geo_point_2d,
+        last_edited_date,
+        ih
+    FROM bikes
+    WHERE last_edited_date = (
+        SELECT max(last_edited_date)
+        FROM bikes
+        {% if defined(max_date) %}
+        WHERE last_edited_date <= {{DateTime(max_date)}}
+        {% end %}
+    )
+
+TYPE endpoint
