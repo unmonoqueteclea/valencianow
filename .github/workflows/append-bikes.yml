@@ -17,4 +17,4 @@ jobs:
         curl \
           -H "Authorization: Bearer ${{ secrets.TINYBIRD_TOKEN }}" \
           -X POST "${{ secrets.TINYBIRD_HOST }}/v0/datasources?mode=append&name=bikes" \
-          -d url='https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets/punts-mesura-bicis-espires-electromagnetiques-puntos-medida-bicis-espiras-electr/exports/csv\?lang\=en\&timezone\=Europe%2FMadrid\&use_labels\=true\&delimiter\=%3B'
+          -d url='https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets/punts-mesura-bicis-espires-electromagnetiques-puntos-medida-bicis-espiras-electr/exports/csv?lang=en&timezone=Europe%2FMadrid&use_labels=true&delimiter=%3B'
