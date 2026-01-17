@@ -1,0 +1,22 @@
+DESCRIPTION >
+    Cars Traffic Measurements. Generated from https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets/punts-mesura-trafic-espires-electromagnetiques-puntos-medida-trafico-espiras-ele/exports/csv?lang=en&timezone=Europe%2FMadrid&use_labels=true&delimiter=%3B
+
+SCHEMA >
+    `_fecha_actualizacion` Nullable(DateTime),
+    `created_user` String,
+    `created_date` DateTime,
+    `last_edited_user` String,
+    `last_edited_date` DateTime,
+    `gid` Int64,
+    `angulo` Int32,
+    `idpm` Int32,
+    `ih` Nullable(Int32),
+    `globalid` String,
+    `fiwareid` Nullable(String),
+    `geo_shape` String,
+    `geo_point_2d` String
+
+ENGINE "MergeTree"
+ENGINE_SORTING_KEY "last_edited_date, idpm"
+# ENGINE_TTL "timestamp + toIntervalDay(60)"
+# Learn more at https://www.tinybird.co/docs/forward/dev-reference/datafiles/datasource-files

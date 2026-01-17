@@ -1,0 +1,27 @@
+DESCRIPTION >
+    Air Quality Measurement. Generated from https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets/estacions-contaminacio-atmosferiques-estaciones-contaminacion-atmosfericas/exports/csv?lang=en&timezone=Europe%2FMadrid&use_labels=true&delimiter=%3B
+
+SCHEMA >
+    `_objectid` Int16,
+    `nom___nombre` String,
+    `adre_a___direccion` String,
+    `tipus_zona___tipo_zona` String,
+    `par_metres___par_metros` Nullable(String),
+    `mesuraments___mediciones` Nullable(String),
+    `so2` Nullable(Float32),
+    `no2` Float32,
+    `o3` Nullable(Float32),
+    `co` Nullable(Float32),
+    `pm10` Nullable(Float32),
+    `pm25` Nullable(Float32),
+    `tipoemision` String,
+    `fecha_carga` DateTime,
+    `calidad_ambiental` String,
+    `fiwareid` String,
+    `geo_shape` String,
+    `geo_point_2d` String
+
+ENGINE "MergeTree"
+ENGINE_SORTING_KEY "fecha_carga, _objectid"
+# ENGINE_TTL "timestamp + toIntervalDay(60)"
+# Learn more at https://www.tinybird.co/docs/forward/dev-reference/datafiles/datasource-files
