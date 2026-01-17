@@ -57,7 +57,8 @@ def render_tab_car(tab) -> None:
             f"""ℹ️⠀Induction loops in different parts of the city that are able to measure the number
             of **cars** passing through them. Both maps represent *number of cars per hour*
             \n💾⠀Original data from [Valencia Open Data: Puntos medida tráfico espiras
-            electromagnéticas]({config.CARS_DATA_URL})."""
+            electromagnéticas]({config.CARS_DATA_URL}). Balizas V16 data obtained from
+            [DGT - Dirección General de Tráfico](https://www.dgt.es)."""
         )
         car_date_info, car_date_reset = st.empty(), st.empty()
         car_selected_date = components.date_selector(1)
@@ -72,9 +73,13 @@ def render_tab_car(tab) -> None:
             car_date_info.markdown(
                 f"""\n 📅⠀Max date currently visualized: `{max_date}` (updated every hour)"""
             )
+            # Load balizas data only when viewing current data (no date filter)
+            balizas_data = None
+            if car_selected_date is None:
+                balizas_data = data.load_balizas_data()
             car_maps_col_1, car_maps_col_2 = st.columns(2)
             with car_maps_col_1:
-                st.pydeck_chart(maps.traffic_now_heatmap(traffic_data))
+                st.pydeck_chart(maps.traffic_now_heatmap(traffic_data, balizas_data))
             with car_maps_col_2:
                 st.pydeck_chart(maps.traffic_now_elevation(traffic_data))
             aggregated_sensor_data(traffic_data, maps.LABEL_CAR)

@@ -1,8 +1,12 @@
+import base64
 import datetime
+import json
+import os
 import urllib.parse
 
 import pandas as pd
 import pytz
+import requests
 
 from valencianow import config
 
@@ -167,3 +171,69 @@ def load_data(
     url = f"{config.TINYBIRD_API}/v0/pipes/{pipe_name}.csv?{urllib.parse.urlencode(params)}"
     logger.info(f"Retrieving from Tinybird url {url}")
     return _process(pd.read_csv(url))
+
+
+def decode_baliza_payload(encoded: str) -> dict:
+    """Decode XOR-encoded baliza API response."""
+    decoded_bytes = base64.b64decode(encoded)
+    key = "utf-8"
+    result = bytearray()
+    for i, byte in enumerate(decoded_bytes):
+        result.append(byte ^ ord(key[i % len(key)]))
+    return json.loads(result.decode("utf-8"))
+
+
+def load_balizas_data() -> pd.DataFrame | None:
+    """Fetch baliza V16 (emergency traffic beacon) data from external API.
+
+    Filters for active balizas in Valencia province only.
+    """
+    url = "https://api.mapabalizasv16.es/api/v16"
+    headers = {
+        "accept": "*/*",
+        "accept-language": "en-US,en;q=0.9,es;q=0.8",
+        "cache-control": "no-cache",
+        "origin": "https://mapabalizasv16.es",
+        "pragma": "no-cache",
+        "referer": "https://mapabalizasv16.es/",
+        "sec-ch-ua": '"Not(A:Brand";v="8", "Chromium";v="144", "Brave";v="144"',
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-site",
+        "sec-gpc": "1",
+        "x-api-key": "1j74ls84yj",
+    }
+
+    response = requests.get(url, headers=headers, timeout=10)
+    response.raise_for_status()
+    data = decode_baliza_payload(response.text)
+    df = pd.DataFrame(data["balizas"])
+    # Normalize to standard columns
+    df[COL_LAT] = pd.to_numeric(df["lat"])
+    df[COL_LON] = pd.to_numeric(df["lon"])
+    df["firstSeen"] = pd.to_datetime(df["firstSeen"])
+    df["lastSeen"] = pd.to_datetime(df["lastSeen"])
+    logger.info(f"Loaded {len(df)} balizas")
+    # Filter for Valencia province (both "Valencia" and "València" spellings)
+    df = df[df["provincia"].str.lower().str.contains("valencia", na=False)]
+    logger.info(f"Filtered to {len(df)} balizas in Valencia province")
+    # Filter for active status - check various possible active status values
+    active_statuses = ["activa", "active", "activado", "on", "true", "1", "yes"]
+    df = df[df["status"].str.lower().isin(active_statuses)]
+    logger.info(f"Filtered to {len(df)} active balizas in Valencia province")
+    # Add icon_data column for pydeck IconLayer
+    # Using a real baliza V16 image as data URI to avoid CORS issues
+    static_dir = os.path.join(os.path.dirname(__file__), "static")
+    img_path = os.path.join(static_dir, "baliza_v16.png")
+    with open(img_path, "rb") as f:
+        img_data = base64.b64encode(f.read()).decode("utf-8")
+    img_url = f"data:image/png;base64,{img_data}"
+    icon_mapping = {
+        "url": img_url,
+        "width": 256,
+        "height": 256,
+        "anchorY": 128,
+        "anchorX": 128,
+    }
+    df["icon_data"] = [icon_mapping] * len(df)
+    return df  # type: ignore

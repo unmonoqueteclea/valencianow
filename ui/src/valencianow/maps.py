@@ -13,11 +13,45 @@ SCALE_BIKE, SCALE_CAR = 5, 0.5
 AGGREGATION = "MEAN"
 
 
-def traffic_now_heatmap(rows: pd.DataFrame, is_bike=False):
+def balizas_icon_layer(balizas_df: pd.DataFrame) -> pdk.Layer:
+    """IconLayer for displaying active balizas on the map."""
+    return pdk.Layer(
+        "IconLayer",
+        data=balizas_df,
+        get_position=[data.COL_LON, data.COL_LAT],
+        get_icon="icon_data",
+        get_size=47,
+        pickable=True,
+        tooltip=False,
+    )
+
+
+def traffic_now_heatmap(
+    rows: pd.DataFrame, balizas_df: pd.DataFrame | None = None, is_bike=False
+):
     """Heatmap with current traffic values"""
 
     max_ih = MAX_IH_BIKE if is_bike else MAX_IH_CAR
     radius = RADIUS_BIKE if is_bike else RADIUS_CAR
+
+    layers = [
+        pdk.Layer(
+            "HeatmapLayer",
+            data=rows,
+            color_domain=[100, max_ih],
+            intensity=1,
+            radius_pixels=radius,
+            get_position=f"[{data.COL_LON}, {data.COL_LAT}]",
+            aggregation=AGGREGATION,
+            opacity=0.5,
+            get_weight="ih",
+            pickable=True,
+            extruded=True,
+        )
+    ]
+
+    if balizas_df is not None and not balizas_df.empty:
+        layers.append(balizas_icon_layer(balizas_df))
 
     return pdk.Deck(
         map_style="dark",
@@ -25,21 +59,7 @@ def traffic_now_heatmap(rows: pd.DataFrame, is_bike=False):
         initial_view_state=pdk.ViewState(
             latitude=config.VALENCIA_LAT, longitude=config.VALENCIA_LON, zoom=12
         ),
-        layers=[
-            pdk.Layer(
-                "HeatmapLayer",
-                data=rows,
-                color_domain=[100, max_ih],
-                intensity=1,
-                radius_pixels=radius,
-                get_position=f"[{data.COL_LON}, {data.COL_LAT}]",
-                aggregation=AGGREGATION,
-                opacity=0.5,
-                get_weight="ih",
-                pickable=True,
-                extruded=True,
-            )
-        ],
+        layers=layers,
     )
 
 
