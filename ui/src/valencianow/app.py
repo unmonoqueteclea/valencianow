@@ -125,7 +125,7 @@ def render_tab_air(tab) -> None:
     with tab:
         st.markdown(
             """ℹ️ Air quality measurements
-        ([ICA](https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/atmosfera-y-calidad-del-aire/calidad-del-aire/ica.html))
+        ([ICA](https://www.miteco.gob.es/es/calidad-y-evaluacion-ambiental/temas/atmosfera-y-calidad-del-aire/visualizacion-datos-calidad-del-aire/ica.html))
         in different parts of the city. Possible values are:"""
         )
         st.markdown(

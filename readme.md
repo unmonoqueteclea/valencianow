@@ -13,11 +13,12 @@ shown in an [Streamlit](https://streamlit.io/) application.
 ## How it works
 
 The system consists of two main components: data ingestion pipelines
-in `Tinybird` that collect and process sensor data from Valencia's
-open data portal, and a `Streamlit` web application that visualizes
-real-time and historical data through interactive maps and charts.
-Sensor locations are geocoded to human-readable addresses using a
-standalone script that leverages OpenStreetMap's Nominatim service.
+in `Tinybird` that collect and process sensor data from [Valencia's
+open data portal](https://valencia.opendatasoft.com/), and a
+`Streamlit` web application that visualizes real-time and historical
+data through interactive maps and charts. Additionally, the application
+displays live emergency vehicle locations from V16 beacons in the
+Valencia region.
 
 ## Installation and Usage
 
@@ -34,7 +35,7 @@ export TINYBIRD_HOST=https://api.tinybird.co
 export TINYBIRD_TOKEN=your_token_here
 ```
 
-Install [uv](https://docs.astral.sh/uv/) and run the Streamlit application:
+Install [uv](https://docs.astral.sh/uv/) and run the `Streamlit` application:
 
 ```bash
 cd ui
