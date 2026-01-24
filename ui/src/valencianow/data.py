@@ -3,6 +3,7 @@ import datetime
 import json
 import os
 import urllib.parse
+from functools import lru_cache
 
 import pandas as pd
 import pytz
@@ -237,3 +238,39 @@ def load_balizas_data() -> pd.DataFrame | None:
     }
     df["icon_data"] = [icon_mapping] * len(df)
     return df  # type: ignore
+
+
+@lru_cache(maxsize=1)
+def load_sensor_addresses() -> dict:
+    """Load sensor addresses from JSON file.
+
+    Cached to avoid reading file multiple times.
+    Returns empty dict if file doesn't exist (graceful degradation).
+    """
+    static_dir = os.path.join(os.path.dirname(__file__), "static")
+    json_path = os.path.join(static_dir, "sensor_addresses.json")
+
+    try:
+        with open(json_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        logger.warning(f"Sensor addresses file not found at {json_path}")
+        return {"sensors": {}}
+    except json.JSONDecodeError as e:
+        logger.error(f"Error parsing sensor addresses JSON: {e}")
+        return {"sensors": {}}
+
+
+def get_sensor_display_name(sensor_id: int | str, sensor_type: str) -> str:
+    """Get display name for a sensor (ID - Address format).
+
+    Falls back to just sensor ID if address not found.
+    """
+    addresses = load_sensor_addresses()
+    key = f"{sensor_type}_{sensor_id}"
+
+    sensor_data = addresses.get("sensors", {}).get(key)
+    if sensor_data:
+        return sensor_data.get("display_name", str(sensor_id))
+
+    return str(sensor_id)

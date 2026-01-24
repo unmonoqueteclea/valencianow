@@ -9,10 +9,16 @@ def aggregated_sensor_data(data_now: pd.DataFrame, label: str) -> None:
     sensor_param = info[data.TB_SENSOR_PARAM]
     st.markdown("## ➕ Individual sensor data")
     with st.form(f"aggregated-sensor-{label}"):
-        sensor = st.selectbox(
-            "🔢 Select a sensor to show its data (sensor ids in map tooltips)",
-            sorted(data_now[data.COL_SENSOR].values),
+        sensor_ids = sorted(data_now[data.COL_SENSOR].unique())
+        sensor_options = {
+            data.get_sensor_display_name(int(sid), label): int(sid)
+            for sid in sensor_ids
+        }
+        sensor_display = st.selectbox(
+            "🔢 Select a sensor to show its data",
+            options=list(sensor_options.keys()),
         )
+        sensor = sensor_options[sensor_display]
         timespan = st.radio(
             "Select a time span: ",
             ["Today", "Last Week", "Last Month", "Last Year"],

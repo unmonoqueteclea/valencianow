@@ -9,3 +9,34 @@ and **air quality** is periodically collected and stored with
 shown in an [Streamlit](https://streamlit.io/) application.
 
 ![maps](https://github.com/unmonoqueteclea/valencianow/blob/main/ui/res/maps.png?raw=true)
+
+## How it works
+
+The system consists of two main components: data ingestion pipelines
+in `Tinybird` that collect and process sensor data from Valencia's
+open data portal, and a `Streamlit` web application that visualizes
+real-time and historical data through interactive maps and charts.
+Sensor locations are geocoded to human-readable addresses using a
+standalone script that leverages OpenStreetMap's Nominatim service.
+
+## Installation and Usage
+
+First, set up the data infrastructure in Tinybird using the
+configuration files in the `tinybird/` folder to create all required
+data sources, pipes, and endpoints. A **GitHub Actions** pipeline
+automatically collects data from Valencia's open data portal and sends
+it to `Tinybird` on a periodic schedule.
+
+Set the required environment variables for Tinybird access:
+
+```bash
+export TINYBIRD_HOST=https://api.tinybird.co
+export TINYBIRD_TOKEN=your_token_here
+```
+
+Install [uv](https://docs.astral.sh/uv/) and run the Streamlit application:
+
+```bash
+cd ui
+uv run streamlit run src/valencianow/app.py
+```
