@@ -10,7 +10,7 @@ SQL >
             multiIf(
                 calidad_ambiental = 'Buena', 6,
                 calidad_ambiental = 'Razonablemente Buena', 5,
-                calidad_ambiental = 'Moderada', 4,
+                calidad_ambiental = 'Regular', 4,
                 calidad_ambiental = 'Desfavorable', 3,
                 calidad_ambiental = 'Muy desfavorable', 2,
                 calidad_ambiental = 'Peligrosa', 1,
