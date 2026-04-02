@@ -10,9 +10,9 @@ TINYBIRD_API = os.environ["TINYBIRD_HOST"]
 TINYBIRD_TOKEN = os.environ["TINYBIRD_TOKEN"]
 
 # urls of the original data sources
-OPENDATA_VAL = "https://valencia.opendatasoft.com/explore/dataset"
-CARS_DATA_URL = f"{OPENDATA_VAL}/punts-mesura-trafic-espires-electromagnetiques-puntos-medida-trafico-espiras-ele/"
-BIKES_DATA_URL = f"{OPENDATA_VAL}/punts-mesura-bicis-espires-electromagnetiques-puntos-medida-bicis-espiras-electr/"
+OPENDATA_VAL = "https://opendata.vlci.valencia.es/dataset"
+CARS_DATA_URL = f"{OPENDATA_VAL}/intensidad-de-los-puntos-de-medida-de-trafico-espiras-electromagneticas"
+BIKES_DATA_URL = f"{OPENDATA_VAL}/intensitat-dels-punts-de-mesura-de-bicicletes-espires-electromagnetiques"
 AIR_DATA_URL = f"{OPENDATA_VAL}/estacions-contaminacio-atmosferiques-estaciones-contaminacion-atmosfericas/"
 
 logger = logging.getLogger("valencianow")

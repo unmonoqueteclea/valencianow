@@ -1,10 +1,9 @@
-name: append bike traffic data data every 15 mins
+name: append bike traffic data every hour
 
 on:
-  push:
   workflow_dispatch:
   schedule:
-    - cron:  '*/15 * * * *'
+    - cron: '0 * * * *'
 
 jobs:
   scheduled:
@@ -13,8 +12,7 @@ jobs:
     - name: Check out this repo
       uses: actions/checkout@v4
     - name: append new bike traffic data
-      run: |-
-        curl \
-          -H "Authorization: Bearer ${{ secrets.TINYBIRD_TOKEN }}" \
-          -X POST "${{ secrets.TINYBIRD_HOST }}/v0/datasources?mode=append&name=bikes" \
-          -d url='https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets/punts-mesura-bicis-espires-electromagnetiques-puntos-medida-bicis-espiras-electr/exports/csv?lang=en&timezone=Europe%2FMadrid&use_labels=true&delimiter=%3B'
+      env:
+        TINYBIRD_HOST: ${{ secrets.TINYBIRD_HOST }}
+        TINYBIRD_TOKEN: ${{ secrets.TINYBIRD_TOKEN }}
+      run: bash .github/scripts/fetch_bikes_traffic.sh
