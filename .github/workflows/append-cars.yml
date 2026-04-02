@@ -1,9 +1,9 @@
-name: append car traffic data every hour
+name: append car traffic data every 30 min
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '0,30 * * * *'
 
 jobs:
   scheduled:
