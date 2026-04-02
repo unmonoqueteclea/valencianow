@@ -1,10 +1,9 @@
-name: append car traffic data data every hour
+name: append car traffic data every hour
 
 on:
-  push:
   workflow_dispatch:
   schedule:
-    - cron:  '0 * * * *'
+    - cron: '0 * * * *'
 
 jobs:
   scheduled:
@@ -13,7 +12,7 @@ jobs:
     - name: Check out this repo
       uses: actions/checkout@v4
     - name: append new car traffic data
-      run: |-
-        curl \
-          -H "Authorization: Bearer ${{ secrets.TINYBIRD_TOKEN }}" \
-          -X POST "${{ secrets.TINYBIRD_HOST }}/v0/datasources?mode=append&name=cars" -d url='https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets/punts-mesura-trafic-espires-electromagnetiques-puntos-medida-trafico-espiras-ele/exports/csv?lang=en&timezone=Europe%2FMadrid&use_labels=true&delimiter=%3B'
+      env:
+        TINYBIRD_HOST: ${{ secrets.TINYBIRD_HOST }}
+        TINYBIRD_TOKEN: ${{ secrets.TINYBIRD_TOKEN }}
+      run: bash .github/scripts/fetch_cars_traffic.sh
