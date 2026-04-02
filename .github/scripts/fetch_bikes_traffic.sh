@@ -1,38 +1,34 @@
 #!/bin/bash
 set -euo pipefail
 
-GEOJSON_URL="https://geoportal.valencia.es/apps/OpenData/Trafico/tra_espiras_bici_p.json"
+# Live ArcGIS MapServer endpoint — updated regularly with real bike traffic data.
+# outSR=4326 requests WGS84 coordinates directly (avoids UTM conversion).
+# resultRecordCount=5000 ensures all ~150 sensors are returned in one request.
+MAPSERVER_URL="https://geoportal.valencia.es/server/rest/services/OPENDATA/Trafico/MapServer/225/query?where=1%3D1&outFields=idpm,ih,last_edited_date&f=json&outSR=4326&resultRecordCount=5000"
 
-# Fetch GeoJSON snapshot
-curl --fail --max-time 30 "$GEOJSON_URL" > /tmp/bikes_traffic.json
+# Fetch MapServer JSON snapshot
+curl --fail --max-time 30 "$MAPSERVER_URL" > /tmp/bikes_traffic.json
 
-# Validate the response contains a features array (guards against CDN error pages
-# or empty responses that curl --fail would not catch)
+# Validate the response contains a features array (guards against server error responses
+# that curl --fail would not catch)
 jq -e '.features | length > 0' /tmp/bikes_traffic.json > /dev/null
 
 # Transform to NDJSON and POST to Tinybird Events API.
 # Rows are skipped when:
-#   - hora_actualizacion is null, not a string, or not 14 chars (inactive sensors
-#     or malformed data — storing them would corrupt the sorting key)
+#   - last_edited_date is null (no valid timestamp — required as sorting key)
 #   - geometry is null (no usable coordinates)
+# ih can be null (sensor exists but has no current reading) — stored as-is.
 jq -c '
   .features[]
   | select(
-      .properties.hora_actualizacion != null
-      and (.properties.hora_actualizacion | type) == "string"
-      and (.properties.hora_actualizacion | length) == 14
+      .attributes.last_edited_date != null
       and .geometry != null
     )
   | {
-      last_edited_date: (.properties.hora_actualizacion |
-        .[0:4] + "-" + .[4:6] + "-" + .[6:8] + " " +
-        .[8:10] + ":" + .[10:12] + ":" + .[12:14]),
-      idpm: .properties.idpm,
-      ih: .properties.ih,
-      geo_point_2d: (
-        (.geometry.coordinates[1] | tostring) + "," +
-        (.geometry.coordinates[0] | tostring)
-      )
+      last_edited_date: (.attributes.last_edited_date / 1000 | strftime("%Y-%m-%d %H:%M:%S")),
+      idpm: .attributes.idpm,
+      ih: .attributes.ih,
+      geo_point_2d: ((.geometry.y | tostring) + "," + (.geometry.x | tostring))
     }
 ' /tmp/bikes_traffic.json \
 | curl --fail --max-time 60 \
