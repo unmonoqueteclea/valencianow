@@ -108,8 +108,14 @@ def _process(df: pd.DataFrame) -> pd.DataFrame | None:
             is_datetime = pd.api.types.is_datetime64_any_dtype(df[COL_DATETIME])
             if not is_datetime:
                 df[COL_DATETIME] = pd.to_datetime(df[COL_DATETIME])
-            # add one hour to correct timezone offset
-            df[COL_DATETIME] = df[COL_DATETIME] + pd.Timedelta(hours=1)
+            # convert from UTC to Europe/Madrid local time (handles CET/CEST DST automatically)
+            madrid_tz = pytz.timezone("Europe/Madrid")
+            df[COL_DATETIME] = (
+                df[COL_DATETIME]
+                .dt.tz_localize("UTC")
+                .dt.tz_convert(madrid_tz)
+                .dt.tz_localize(None)
+            )
             # update COL_DATE to reflect the adjusted datetime
             if COL_DATE in df.columns:
                 df[COL_DATE] = df[COL_DATETIME].dt.strftime("%Y-%m-%d %H:%M:%S")
