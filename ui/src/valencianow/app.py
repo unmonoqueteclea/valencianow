@@ -68,10 +68,7 @@ def render_tab_car(tab) -> None:
         )
         car_date_info, car_date_reset = st.empty(), st.empty()
         car_selected_date = components.date_selector(1)
-        # local_time=True: cars timestamps are stored as Spain local time in Tinybird
-        # (Valencia's ArcGIS timezone bug — see data._process), so the date filter
-        # must not be converted to UTC.
-        traffic_data = data.load_data("cars_now", car_selected_date, local_time=True)
+        traffic_data = data.load_data("cars_now", car_selected_date)
         car_selected_date = components.reset_date_filter(
             car_selected_date, car_date_reset
         )
@@ -104,8 +101,7 @@ def render_tab_bike(tab) -> None:
         )
         bike_date_info, bike_reset = st.empty(), st.empty()
         bike_date = components.date_selector(2)
-        # local_time=True: same as cars — bikes timestamps are Spain local time.
-        traffic_bike_data = data.load_data("bikes_now", bike_date, local_time=True)
+        traffic_bike_data = data.load_data("bikes_now", bike_date)
         bike_date = components.reset_date_filter(bike_date, bike_reset)
         if traffic_bike_data is None:
             st.error("No data found for selected date and time")
@@ -139,9 +135,7 @@ def render_tab_air(tab) -> None:
         )
         air_date_info, air_date_reset = st.empty(), st.empty()
         air_date = components.date_selector(3)
-        # local_time=True: fecha_carga is stored as Spain local time in Tinybird,
-        # so the date filter must not be converted to UTC.
-        air_quality_data = data.load_data("air_now", air_date, local_time=True)
+        air_quality_data = data.load_data("air_now", air_date)
         air_date = components.reset_date_filter(air_date, air_date_reset)
         if air_quality_data is None:
             st.error("No data found for selected date and time")

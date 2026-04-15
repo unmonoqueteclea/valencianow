@@ -108,19 +108,18 @@ def _process(df: pd.DataFrame) -> pd.DataFrame | None:
             is_datetime = pd.api.types.is_datetime64_any_dtype(df[COL_DATETIME])
             if not is_datetime:
                 df[COL_DATETIME] = pd.to_datetime(df[COL_DATETIME])
-            # No timezone conversion needed here. All data sources store Spain local
-            # time (CET/CEST) in Tinybird — no UTC offset should be applied.
-            #
-            # Cars and bikes: Valencia's ArcGIS MapServer has a known timezone bug —
-            # it stores local CET/CEST time in the epoch ms field as if it were UTC
-            # (confirmed by querying with/without timeReferenceUnknownClient=true).
-            # jq's strftime treats the epoch as UTC, so it decodes it back to the
-            # correct local Spain time. The stored string is already Spain local time.
-            #
-            # Air quality: fecha_carga is also stored as Spain local time, which is
-            # why load_data() uses local_time=True for air (no UTC conversion on the
-            # date filter either).
-            # update COL_DATE to reflect the datetime
+            # All datasources store UTC timestamps in Tinybird (the ArcGIS epoch ms
+            # field is genuine UTC). Convert to Europe/Madrid so displayed times match
+            # Spain wall-clock time instead of showing UTC (which appears 2 h behind
+            # in CEST, matching the "3-hour lag" the user sees when combined with the
+            # ~1 h the geoportal itself lags behind real-time).
+            madrid_tz = pytz.timezone("Europe/Madrid")
+            df[COL_DATETIME] = (
+                df[COL_DATETIME]
+                .dt.tz_localize("UTC")
+                .dt.tz_convert(madrid_tz)
+                .dt.tz_localize(None)
+            )
             if COL_DATE in df.columns:
                 df[COL_DATE] = df[COL_DATETIME].dt.strftime("%Y-%m-%d %H:%M:%S")
         return df
@@ -130,13 +129,9 @@ def _process(df: pd.DataFrame) -> pd.DataFrame | None:
 def _date_to_utc(date: str) -> str:
     """Convert a Europe/Madrid local datetime string to UTC.
 
-    Used only for air quality data (fecha_carga), which is stored as real UTC
-    in Tinybird. The user picks a date in local Spain time, so we must convert
-    it to UTC before sending it as a Tinybird query filter.
-
-    Cars and bikes store local Spain time directly (due to Valencia's ArcGIS
-    timezone bug — see _process), so their load_data calls use local_time=True
-    to bypass this conversion.
+    All Tinybird datasources store UTC. The date selector shows times in
+    Madrid local time (after the UTC→Madrid conversion in _process), so any
+    user-supplied filter must be converted back to UTC before querying.
     """
     madrid_tz = pytz.timezone("Europe/Madrid")
     utc_tz = pytz.utc
@@ -172,13 +167,9 @@ def load_data(
     Some optional filters can be provided.
     A None value can be returned if there are no rows.
 
-    local_time controls how filter_max_date is interpreted:
-    - local_time=False (default): filter_max_date is treated as Spain local time
-      and converted to UTC before querying. Use this for air quality (fecha_carga
-      stored as real UTC in Tinybird).
-    - local_time=True: filter_max_date is passed as-is to Tinybird. Use this for
-      cars and bikes, whose timestamps are stored as Spain local time in Tinybird
-      due to Valencia's ArcGIS timezone bug (see _process and _date_to_utc).
+    local_time=False (default): filter_max_date is treated as Spain local time
+    and converted to UTC before querying. All datasources store UTC, so this
+    should always be False.
     """
     params: dict = {}
     if filter_max_date:
