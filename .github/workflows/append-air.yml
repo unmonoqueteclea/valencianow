@@ -1,4 +1,4 @@
-name: append air quality data data every 30 mins
+name: append air quality data every 30 mins
 
 on:
   push:
@@ -13,8 +13,7 @@ jobs:
     - name: Check out this repo
       uses: actions/checkout@v4
     - name: append new air quality data
-      run: |-
-        curl \
-          -H "Authorization: Bearer ${{ secrets.TINYBIRD_TOKEN }}" \
-          -X POST "${{ secrets.TINYBIRD_HOST }}/v0/datasources?mode=append&name=air" \
-          -d url='https://valencia.opendatasoft.com/api/explore/v2.1/catalog/datasets/estacions-contaminacio-atmosferiques-estaciones-contaminacion-atmosfericas/exports/csv?lang=en&timezone=Europe%2FMadrid&use_labels=false&delimiter=%3B'
+      env:
+        TINYBIRD_HOST: ${{ secrets.TINYBIRD_HOST }}
+        TINYBIRD_TOKEN: ${{ secrets.TINYBIRD_TOKEN }}
+      run: bash .github/scripts/fetch_air_quality.sh
