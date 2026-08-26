@@ -1,0 +1,43 @@
+name: keepalive
+
+# GitHub disables scheduled workflows after 60 days of repository inactivity,
+# which silently stops the data ingestion pipelines. This workflow pushes an
+# empty commit when the repo has been quiet for a while, resetting that clock.
+#
+# It runs weekly but only commits when the last commit is older than
+# KEEPALIVE_AFTER_DAYS, so it adds roughly one commit every 50 days rather
+# than one per week.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1'
+
+permissions:
+  contents: write
+
+env:
+  KEEPALIVE_AFTER_DAYS: 50
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out this repo
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+    - name: push an empty commit if the repo has been inactive
+      run: |-
+        last_commit=$(git log -1 --format=%ct)
+        now=$(date +%s)
+        days=$(( (now - last_commit) / 86400 ))
+        echo "Last commit was $days day(s) ago (threshold: ${KEEPALIVE_AFTER_DAYS})."
+        if [ "$days" -lt "${KEEPALIVE_AFTER_DAYS}" ]; then
+          echo "Repo is active, nothing to do."
+          exit 0
+        fi
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git commit --allow-empty -m "chore: keepalive to prevent scheduled workflows being disabled"
+        git push
