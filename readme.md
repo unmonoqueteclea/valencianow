@@ -1,7 +1,7 @@
 # 🦇 valencia now
 
 ⌚ Real-time traffic information about the city of Valencia
-(Spain). 🔗 [Check it now!](https://valencianow.unmonoqueteclea.freemyip.com/)
+(Spain). 🔗 [Check it now!](https://valencianow.tamarin-avior.ts.net/)
 
 Data from **public sources** about **car traffic**, **bikes traffic**
 and **air quality** is periodically collected and stored with
